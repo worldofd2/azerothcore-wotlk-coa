@@ -18544,7 +18544,7 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
     // UNIT_FIELD_BYTES_2
     if (posPointers.UnitFieldBytes2Pos >= 0)
     {
-        if (IsControlledByPlayer() && target != this && sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && IsInRaidWith(target))
+        if ((IsControlledByPlayer() || HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED)) && target != this && sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && IsInRaidWith(target))
         {
             FactionTemplateEntry const* ft1 = GetFactionTemplateEntry();
             FactionTemplateEntry const* ft2 = target->GetFactionTemplateEntry();
@@ -18562,7 +18562,7 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
     // UNIT_FIELD_FACTIONTEMPLATE
     if (posPointers.UnitFieldFactionTemplatePos >= 0)
     {
-        if (IsControlledByPlayer() && target != this && sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && IsInRaidWith(target))
+        if ((IsControlledByPlayer() || HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED)) && target != this && sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && IsInRaidWith(target))
         {
             FactionTemplateEntry const* ft1 = GetFactionTemplateEntry();
             FactionTemplateEntry const* ft2 = target->GetFactionTemplateEntry();

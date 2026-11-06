@@ -6470,14 +6470,6 @@ private:
             group->ConvertToLFG();
             group->SetDungeonDifficulty(Difficulty(dungeon->difficulty));
             sLFGMgr->SetDungeon(group->GetGUID(), dungeon->Entry());
-            if (auto method = step.get_optional<uint32>("loot_method"))
-            {
-                group->SetLootMethod(LootMethod(*method));
-                group->SendUpdate();
-            }
-            for (GroupReference* member = group->GetFirstMember(); member; member = member->next())
-                if (Player* memberPlayer = member->GetSource())
-                    LocalLevelScaling::NotifyScalingChanged(memberPlayer);
         }
         else if (action == "lfg_teleport")
         {

@@ -361,10 +361,7 @@ void AssignLevel(Player* owner, Item* item, uint32 key)
 
 bool LootScalesFor(Player const* player)
 {
-    if (LocalLevelScaling::DungeonLootScales(player))
-        return true;
-    return LocalLevelScaling::DungeonScalingFor(player) != LocalLevelScaling::DungeonScaling::WalkedIn &&
-        ScalingChosenBy(player);
+    return LocalLevelScaling::DungeonLootScales(player) || ScalingChosenBy(player);
 }
 
 void AssignDropLevel(Player* looter, Item* item, uint32 base = 0)
@@ -463,15 +460,6 @@ void SendPreviewFlag(Player* player)
 
     WorldPacket data = ItemLadder::BuildPreviewAddon(player->GetGUID());
     player->SendDirectMessage(&data);
-}
-
-void SendClientState(Player* player)
-{
-    if (!enabled.load(std::memory_order_relaxed) || !player)
-        return;
-
-    SendPreviewFlag(player);
-    SendAllLevels(player);
 }
 
 PendingStatQueries pendingStatQueries;
@@ -630,16 +618,15 @@ class Acquisition : public PlayerScript
 public:
     Acquisition() : PlayerScript("NativeItemScalingAcquisition", { PLAYERHOOK_ON_LOGIN, PLAYERHOOK_ON_LOOT_ITEM,
         PLAYERHOOK_ON_GROUP_ROLL_REWARD_ITEM, PLAYERHOOK_ON_QUEST_REWARD_ITEM, PLAYERHOOK_ON_STORE_NEW_ITEM,
-        PLAYERHOOK_ON_UPDATE, PLAYERHOOK_ON_LOGOUT, PLAYERHOOK_ON_MAP_CHANGED }) { }
+        PLAYERHOOK_ON_UPDATE, PLAYERHOOK_ON_LOGOUT }) { }
 
     void OnPlayerLogin(Player* player) override
     {
-        SendClientState(player);
-    }
+        if (!enabled.load(std::memory_order_relaxed))
+            return;
 
-    void OnPlayerMapChanged(Player* player) override
-    {
-        SendClientState(player);
+        SendPreviewFlag(player);
+        SendAllLevels(player);
     }
 
     void OnPlayerUpdate(Player* player, uint32) override

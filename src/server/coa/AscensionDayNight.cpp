@@ -87,7 +87,13 @@ private:
 class ascension_day_night_player : public PlayerScript
 {
 public:
-    ascension_day_night_player() : PlayerScript("ascension_day_night_player", { PLAYERHOOK_ON_MAP_CHANGED }) { }
+    ascension_day_night_player() : PlayerScript("ascension_day_night_player", { PLAYERHOOK_ON_LOGIN, PLAYERHOOK_ON_MAP_CHANGED }) { }
+
+    void OnPlayerLogin(Player* player) override
+    {
+        if (AscensionDayNight::Factor() != 1.0f)
+            AscensionDayNight::SendClientClock(player);
+    }
 
     void OnPlayerMapChanged(Player* player) override
     {

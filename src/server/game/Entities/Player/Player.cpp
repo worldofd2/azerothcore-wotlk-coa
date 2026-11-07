@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AscensionDayNight.h"
 #include "Player.h"
 #include "AscensionQuestMarkers.h"
 #include "AccountMgr.h"
@@ -12468,7 +12467,11 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     SendEquipmentSetList();
 
-    AscensionDayNight::SendClientClock(this);
+    data.Initialize(SMSG_LOGIN_SETTIMESPEED, 4 + 4 + 4);
+    data.AppendPackedTime(GameTime::GetGameTime().count());
+    data << float(0.01666667f);                             // game speed
+    data << uint32(0);                                      // added in 3.1.2
+    SendDirectMessage(&data);
 
     GetReputationMgr().SendForceReactions();                // SMSG_SET_FORCED_REACTIONS
 

@@ -4,6 +4,7 @@
  * https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
+#include "AscensionDayNight.h"
 #include "AccountMgr.h"
 #include "AscensionAetherialReliquary.h"
 #include "AscensionAccountProgress.h"
@@ -9297,8 +9298,6 @@ public:
     return true;
   }
 
-  static constexpr float REAL_TIME_GAME_SPEED = 0.01666667f;
-
   static time_t SameDayAt(time_t time, uint8 hour, uint8 minute) {
     std::tm local = Acore::Time::TimeBreakdown(time);
     local.tm_hour = hour;
@@ -9321,13 +9320,9 @@ public:
       return true;
     }
 
-    time_t const now = GameTime::GetGameTime().count();
+    time_t const now = AscensionDayNight::Now();
     time_t const shown = hour ? SameDayAt(now, *hour, minute.value_or(0)) : now;
-    WorldPacket data(SMSG_LOGIN_SETTIMESPEED, 4 + 4 + 4);
-    data.AppendPackedTime(shown);
-    data << REAL_TIME_GAME_SPEED;
-    data << uint32(0);
-    player->SendDirectMessage(&data);
+    AscensionDayNight::SendClientClock(player, shown);
 
     std::tm const clock = Acore::Time::TimeBreakdown(shown);
     handler->PSendSysMessage("Your client's clock now reads {:02}:{:02}.", clock.tm_hour, clock.tm_min);

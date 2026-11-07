@@ -1,4 +1,5 @@
 /* Copyright (C) 2016+ AzerothCore, GNU AGPL v3. */
+#include "AscensionDayNight.h"
 #include "AscensionSunCleric.h"
 #include "AscensionSunClericData.h"
 #include "CellImpl.h"
@@ -314,7 +315,7 @@ void Eclipse(Player* player, Unit* target, uint32 amount)
 }
 bool Daytime()
 {
-    time_t now = time_t(GameTime::GetGameTime().count());
+    time_t now = AscensionDayNight::Now();
     tm local{};
 #ifdef _WIN32
     localtime_s(&local, &now);

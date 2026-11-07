@@ -791,3 +791,15 @@ XPHotspots.ActiveCount = 3
 XPHotspots.BuffSpell = 993945
 # Brand: a short label (32 characters at most, no "|") the client shows with the hotspots; empty = none.
 XPHotspots.Brand = ""
+
+#
+#    CoA.DayNightSpeed
+#        Description: How fast the day/night cycle runs, as a multiple of real time (1 to 24). The sky of every
+#                     client and the CoA abilities that read the night (Witch Hunter, Bloodmage, Sun Cleric)
+#                     follow the same faster clock; server timers, game events, respawns and the Call Board keep
+#                     the real time. The minimap clock shows the faster time; the client's "local time" option
+#                     shows the real one.
+#        Default:     1 - (real time)
+#        Reloadable:  yes (.reload config)
+
+CoA.DayNightSpeed = 1

@@ -3,15 +3,14 @@
 #ifndef ASCENSION_REALM_CLOCK_H
 #define ASCENSION_REALM_CLOCK_H
 
-#include "GameTime.h"
+#include "AscensionDayNight.h"
 #include "Timer.h"
 
 namespace AscensionRealmClock
 {
 inline bool IsNight()
 {
-    uint32 const hour = Acore::Time::GetHours(GameTime::GetGameTime());
-    return hour < 6 || hour >= 18;
+    return AscensionDayNight::IsNightHour(Acore::Time::GetHours(Seconds(AscensionDayNight::Now())));
 }
 }
 

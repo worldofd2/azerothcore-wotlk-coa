@@ -88,6 +88,17 @@ DestinyWeaver.Scaling.DungeonIds = "1 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 3
 
 DestinyWeaver.Scaling.DungeonBands = "401:15-59 402:15-59 45:35-59"
 
+#    DestinyWeaver.Scaling.LfgOnly
+#        Description: Dungeon scaling for Dungeon Finder groups only (the classic dungeons of
+#                     DestinyWeaver.Scaling.DungeonIds and DestinyWeaver.Scaling.DungeonBands).
+#                     0: the dungeon scales for every group inside it, bots and alts included.
+#                     1: only a Dungeon Finder group, in the dungeon it was assigned, plays it at its own
+#                        level; walking in keeps the authored creatures and loot.
+#        Default:     0
+#        Reloadable:  yes (.reload config)
+
+DestinyWeaver.Scaling.LfgOnly = 0
+
 #    DestinyWeaver.ExperienceBonusControl
 #        Description: Whether the Experience Bonus Control service exists at all. A character who
 #                     turns it on stops receiving the bonus experience sources - Potions of

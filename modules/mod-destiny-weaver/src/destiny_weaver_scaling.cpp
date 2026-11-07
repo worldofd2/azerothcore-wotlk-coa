@@ -83,6 +83,10 @@ namespace
     /// config is read where it changes (startup and `.reload config`) and cached here; a key that is
     /// missing keeps the documented default, which is what the options would have answered anyway.
     std::atomic<bool> g_scalingAvailable{false};
+    // DestinyWeaver.Scaling.LfgOnly (CoA Bots 2.9.5): off by default and when the key is missing, the scaled dungeons
+    // scale for every group inside them, bots and alts included, as before #11365; on, only for a Dungeon Finder
+    // group in the dungeon it was assigned (#11365, the official behaviour).
+    std::atomic<bool> g_lfgOnly{false};
 
     bool ScalingAvailable()
     {
@@ -247,6 +251,9 @@ namespace
     {
         if (!player || !ScaledDungeon(map))
             return false;
+        // DestinyWeaver.Scaling.LfgOnly off: every group inside a scaled dungeon plays it at its own level.
+        if (!g_lfgOnly.load(std::memory_order_relaxed))
+            return true;
 
         Group const* group = const_cast<Player*>(player)->GetGroup();
         return group && group->isLFGGroup() &&
@@ -1243,6 +1250,7 @@ public:
         bool const available = sConfigMgr->GetOption<bool>("DestinyWeaver.Enable", true) &&
                                sConfigMgr->GetOption<bool>("DestinyWeaver.LevelScaling", true);
         g_scalingAvailable.store(available, std::memory_order_relaxed);
+        g_lfgOnly.store(sConfigMgr->GetOption<bool>("DestinyWeaver.Scaling.LfgOnly", false), std::memory_order_relaxed);
         LocalLevelScaling::QuestScalingOwner.store(
             available ? &DestinyWeaver::ResolveQuestScaling : nullptr, std::memory_order_relaxed);
         LocalLevelScaling::CreatureViewArmorOwner.store(available ? &ViewArmorFor : nullptr,

@@ -296,7 +296,7 @@ void ActivateModule(Player* player, uint32 id)
     if (Aura* aura = player->GetAura(707495))
         aura->SetScriptValue(707495,id);
     for (ObjectGuid guid : previous)
-        if (Player* ally = ObjectAccessor::FindPlayer(guid))
+        if (Player* ally = ObjectAccessor::FindPlayer(guid); ally && ally->FindMap() == player->FindMap())
             for (uint32 other : TinkerModules)
                 if (other != id)
                     ally->RemoveAurasDueToSpell(other,player->GetGUID());

@@ -4110,6 +4110,20 @@ private:
             time_t const respawn = player->GetMap()->GetCreatureRespawnTime(step.get<uint32>("spawn"));
             return std::max<time_t>(0, respawn - GameTime::GetGameTime().count());
         }
+        if (metric == "nearest_creature_distance")
+        {
+            std::list<Creature*> creatures;
+            player->GetCreatureListWithEntryInGrid(creatures, step.get<uint32>("entry"), 60.0f);
+            float nearest = -1.0f;
+            for (Creature* creature : creatures)
+                if (creature->IsInWorld() && creature->IsAlive() && player->InSamePhase(creature))
+                {
+                    float const distance = player->GetExactDist2d(creature);
+                    if (nearest < 0.0f || distance < nearest)
+                        nearest = distance;
+                }
+            return nearest;
+        }
         if (metric == "nearby_creature_count")
         {
             std::list<Creature*> creatures;
@@ -4130,11 +4144,16 @@ private:
         }
         if (metric == "map_creature_count")
         {
-            uint32 const entry = step.get<uint32>("entry", 0);
+            std::set<uint32> entries;
+            if (uint32 const entry = step.get<uint32>("entry", 0))
+                entries.insert(entry);
+            if (auto listed = step.get_child_optional("entries"))
+                for (auto const& [key, entry] : *listed)
+                    entries.insert(entry.get_value<uint32>());
             auto const& spawns = player->GetMap()->GetCreatureBySpawnIdStore();
-            return std::count_if(spawns.begin(), spawns.end(), [entry](auto const& spawn)
+            return std::count_if(spawns.begin(), spawns.end(), [&entries](auto const& spawn)
             {
-                return (!entry || spawn.second->GetEntry() == entry) && spawn.second->IsInWorld()
+                return (entries.empty() || entries.count(spawn.second->GetEntry())) && spawn.second->IsInWorld()
                     && spawn.second->IsAlive();
             });
         }
@@ -5182,6 +5201,17 @@ private:
         }
         if (metric == "item_count")
         {
+            if (auto items = step.get_child_optional("items"))
+            {
+                uint32 total = 0;
+                for (auto const& [key, entry] : *items)
+                {
+                    uint32 const item = entry.get_value<uint32>();
+                    Require(sObjectMgr->GetItemTemplate(item) != nullptr, "Unknown item in metric");
+                    total += player->GetItemCount(item);
+                }
+                return total;
+            }
             uint32 item = step.get<uint32>("item");
             Require(sObjectMgr->GetItemTemplate(item) != nullptr, "Unknown item in metric");
             return player->GetItemCount(item);

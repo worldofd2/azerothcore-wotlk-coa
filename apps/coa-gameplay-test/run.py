@@ -129,7 +129,8 @@ METRICS = TIMELINE_METRICS | {
     'carried_item_stat',
     'nearby_gameobject_count', 'nearby_gameobject_quest_active', 'nearby_gameobject_state', 'nearby_gameobject_scale',
     'nearby_gameobject_display', 'nearby_gameobject_ground_offset',
-    'nearby_creature_count', 'map_creature_count', 'map_creatures_below_floor', 'nearby_gameobject_at_client',
+    'nearby_creature_count', 'nearest_creature_distance', 'map_creature_count', 'map_creatures_below_floor',
+    'nearby_gameobject_at_client',
     'voidportal_group',
     'carried_money',
     'channel_object_entry',
@@ -211,11 +212,11 @@ METRIC_FIELDS = {'actor', 'metric', 'spell', 'power', 'caster', 'effect', 'item'
                  'base', 'key', 'index', 'pet', 'critical', 'target_pet', 'periodic', 'name', 'text',
                  'min_distance', 'owner_display', 'creator_only', 'ranged_weapon_subclass', 'sheath_state', 'skill',
                  'cache', 'table', 'exclude', 'dungeon', 'source', 'opcode', 'from', 'slot', 'achievement', 'title',
-                 'type_mask', 'hit_mask', 'spell_type_mask',
+                 'type_mask', 'hit_mask', 'spell_type_mask', 'items',
                  'phase_mask', 'trigger_spell', 'trials', 'incoming', 'heal', 'quality',
                  'row', 'offset', 'skip_strings', 'from_end', 'x', 'y', 'min_required_level', 'max_required_level',
                  'flat_coefficient_modifier', 'dominant_stat', 'off_stat', 'below_armor_class', 'unwearable', 'spells',
-                 'min_level', 'max_level', 'min_home_distance', 'spawn',
+                 'min_level', 'max_level', 'min_home_distance', 'spawn', 'entries',
                  'guid', 'spawn_type', 'tolerance', 'map', 'z'} | TIMELINE_FIELDS
 ACTIONS = {
     'stop_attack': ({'actor'}, {'actor'}),
@@ -943,10 +944,21 @@ def validate(scenario):
             validate_placement_metric(step, where, player_ids)
             require(metric not in PLACEMENT_AUDIT_METRICS or placement_audited,
                     f'{where}: placement audit metric needs an earlier placement_audit')
+            require('entries' not in step or metric == 'map_creature_count',
+                    f'{where}: entries only applies to map creature counts')
             if metric == 'map_creature_count':
                 require(step['actor'] in player_ids, f'{where}: creature count needs a player')
                 if 'entry' in step:
                     number(step['entry'], f'{where}.entry', 1, 2**32 - 1, True)
+                if 'entries' in step:
+                    require('entry' not in step, f'{where}: give entry or entries, not both')
+                    require(isinstance(step['entries'], list) and step['entries'],
+                            f'{where}.entries must be a non-empty list')
+                    for index, entry in enumerate(step['entries']):
+                        number(entry, f'{where}.entries[{index}]', 1, 2**32 - 1, True)
+            if metric == 'nearest_creature_distance':
+                require(step['actor'] in player_ids, f'{where}: creature distance needs a player')
+                number(step.get('entry'), f'{where}.entry', 1, 2**32 - 1, True)
             if metric == 'map_creatures_below_floor':
                 require(step['actor'] in player_ids, f'{where}: floor check needs a player')
             if metric == 'nearby_creature_count':
@@ -1095,10 +1107,18 @@ def validate(scenario):
                 number(step['hand'], f'{where}.hand', 0, maximum, True)
             if 'school' in step and metric == 'spell_crit_chance':
                 number(step['school'], f'{where}.school', 0, 6, True)
-            if metric in {'item_count', 'carried_item_level', 'carried_item_required_level', 'carried_item_armor',
+            if metric in {'carried_item_level', 'carried_item_required_level', 'carried_item_armor',
                           'carried_item_scaling_level', 'carried_item_stat', 'loot_offered_item_count',
                           'forced_loot_count'}:
                 require('item' in step, f'{where}: metric needs item')
+            if metric == 'item_count':
+                require(('item' in step) != ('items' in step), f'{where}: metric needs item or items')
+                if 'items' in step:
+                    require(isinstance(step['items'], list) and step['items'],
+                            f'{where}.items must be a non-empty list')
+                    for index, item in enumerate(step['items']):
+                        number(item, f'{where}.items[{index}]', 1, 2**32 - 1, True)
+            require('items' not in step or metric == 'item_count', f'{where}: items only applies to item counts')
             if metric == 'carried_item_stat':
                 number(step.get('stat'), f'{where}.stat', 0, 255, True)
             if metric in {'item_random_property', 'item_suffix_factor', 'item_enchantment',

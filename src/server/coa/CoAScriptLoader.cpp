@@ -79,6 +79,7 @@ void AddSC_CoAVaults();
 void AddSC_CoABlackrockCaverns();
 void AddSC_CoADungeonCompletion();
 void AddSC_CoADungeonSpoils();
+void AddSC_CoADungeonLoot();
 void AddSC_CoADungeonTuning();
 void AddSC_CoAGuardLevel();
 void AddSC_CoATestZoneBonus();
@@ -457,6 +458,7 @@ void AddSC_XPHotspots();
 
 void AddCoAScripts()
 {
+    AddSC_CoADungeonLoot();
     AddAscensionStockCoefficientScripts();
     AddAscensionScalingBaseScripts();
     AddAscensionManastormItemScripts();

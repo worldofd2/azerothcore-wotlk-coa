@@ -385,7 +385,8 @@ case (an omitted field is disabled) and is likewise run exclusively. Its optiona
 `AllowTwoSide.Interaction.Group`, which keeps the configured value when omitted. Optional
 `ptr_character_copy: true` makes this realm both the source and the target of `.ptr copy` for that case, with no
 cooldown, and is likewise run exclusively. Queued copies load and report within a 5-second poll, so wait after
-the command before asserting.
+the command before asserting. With it, `ptr_character_copy_interruption: "before_load"` or `"after_load"` stops
+the first claimed copy at that point, as a realm stopping mid-load would; the next poll recovers the request.
 The [talent and item scenario](scenarios/talent-and-items.json) exercises talent learning, passive removal,
 equipping a shirt and consuming a healing potion. It does not measure the talent's damage coefficient.
 The [Shadowblast scenario](scenarios/shadowblast-shadow-rage.json) reproduces a Shadow Rage pet-targeting crash
@@ -584,7 +585,7 @@ a previously named snapshot of the same metric; it is available on snapshots and
 `target_owned_entry` in place of `target` sends it at the player's living creature of that entry.
 
 Metrics: `health`, `max_health`, `creature_type`, `power`, `max_power`, `alive`, `map_id`, `combat`, `casting`,
-`level`, `quest_objective_count` (needs `quest`, optional `index`), `knows_spell`, `has_talent`, `talent_points`, `active_talent_spec`,
+`level`, `quest_objective_count` (needs `quest`, optional `index`), `knows_spell`, `spell_rank` (the spell's rank in its chain, 1 when unranked), `first_rank_spell` (the first rank of its chain, itself when unranked), `has_talent`, `talent_points`, `active_talent_spec`,
 `cooldown_ms`, `spell_cooldown_packet_ms`, `item_loot_releases`, `item_count`, `carried_item_count`, `bank_bag_slots`, `guild_bank_tabs`, `aura`, `aura_stacks`, `aura_charges`,
 `aura_duration_ms`, `aura_amount`, `pet_entry`, `pet_aura_stacks`, `owned_creature_count`, `owned_creature_spacing`,
 `charm_entry`, `charm_distance`, `charm_aura_stacks`, `owned_creature_sent_faction`, `controls_self`, `private_instance`, `dynamic_object`,
@@ -1119,6 +1120,9 @@ whose grid is not loaded is not counted.
 below the floor under them, or over no floor at all. The floor is searched downward from the higher of the
 creature's current Z and its spawn Z, so a creature that sank through the ground counts while one that walked
 down a ramp does not. Each one counted is logged with its spawn id, position and floor.
+`nearby_gameobject_flags` takes `entry` and returns the `GameObjectFlags` the client gets for the nearest such
+gameobject within 20 yards (4 is `GO_FLAG_INTERACT_COND`, which keeps the client from using it), and
+`nearby_gameobject_quest` the quest a goober requires (0 for none); both return -1 when there is no such gameobject.
 `nearby_gameobject_state` takes `entry` and returns the state of the nearest such gameobject within 20 yards
 (0 open, 1 closed, 99 none).
 `nearby_gameobject_scale` takes `entry` and returns the object scale of the nearest such gameobject within

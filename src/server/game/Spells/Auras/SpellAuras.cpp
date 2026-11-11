@@ -1503,30 +1503,37 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         uint32 spellId = 0;
                         switch (aurEff->GetId())
                         {
-                            // Ebon Plague
+                            // Ebon Plague (CoA copies of the talent: +1100000)
                             case 51161:
+                            case 1151161:
                                 spellId = 51735;
                                 break;
                             case 51160:
+                            case 1151160:
                                 spellId = 51734;
                                 break;
                             case 51099:
+                            case 1151099:
                                 spellId = 51726;
                                 break;
-                            // Crypt Fever
+                            // Crypt Fever (CoA copies of the talent: +1100000)
                             case 49632:
+                            case 1149632:
                                 spellId = 50510;
                                 break;
                             case 49631:
+                            case 1149631:
                                 spellId = 50509;
                                 break;
                             case 49032:
+                            case 1149032:
                                 spellId = 50508;
                                 break;
                             default:
                                 LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Crypt Fever/Ebon Plague ({}) found", aurEff->GetId());
                         }
-                        caster->CastSpell(target, spellId, true, 0, GetEffect(0));
+                        if (spellId)
+                            caster->CastSpell(target, spellId, true, 0, GetEffect(0));
                     }
                 }
                 // Unholy blight
@@ -1744,6 +1751,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 switch (GetId())
                 {
                     case 47788: // Guardian Spirit
+                    case 1147788: // CoA copy (+1100000)
                     {
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;
@@ -1754,7 +1762,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Glyph of Guardian Spirit
                         if (AuraEffect* aurEff = player->GetAuraEffectOfRankedSpellOrTwin(63231, 0))
                         {
-                            if (!player->HasSpellCooldown(47788))
+                            if (!player->HasSpellCooldown(GetSpellInfo()->Id))
                                 break;
 
                             player->AddSpellCooldown(GetSpellInfo()->Id, 0, aurEff->GetAmount()*IN_MILLISECONDS);
@@ -1768,6 +1776,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                     }
                     case 47585: // Dispersion (fixed bug invisible as a Shadow Priest)
+                    case 1147585: // CoA copy (+1100000)
                     {
                         if (target->IsMounted())
                         {
@@ -1890,11 +1899,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             switch (GetId())
             {
                 case 19574: // Bestial Wrath
+                case 1119574: // CoA copy (+1100000)
                     // The Beast Within cast on owner if talent present
                     if (Unit* owner = target->GetOwner())
                     {
                         // Search talent
-                        if (owner->HasAura(34692))
+                        if (owner->HasAura(34692) || owner->HasAura(1134692)) // CoA copy (+1100000)
                         {
                             if (apply)
                                 owner->CastSpell(owner, 34471, true, 0, GetEffect(0));

@@ -210,12 +210,9 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     if(${MODULE_MODULE_VARIABLE} STREQUAL "static")
 
       # Add the module content to the whole static module
-      # CoA: mod-ale and mod-playerbots go to their own static libraries; with them, modules.lib reached
-      # the 4 GB COFF limit (LNK1248)
+      # CoA: mod-ale goes to its own static library; with it, modules.lib passed the 4 GB COFF limit (LNK1248)
       if (SOURCE_MODULE MATCHES "mod-ale")
         CollectSourceFiles(${MODULE_SOURCE_PATH} PRIVATE_SOURCES_MODULE_ALE)
-      elseif (SOURCE_MODULE STREQUAL "mod-playerbots")
-        CollectSourceFiles(${MODULE_SOURCE_PATH} PRIVATE_SOURCES_MODULE_PLAYERBOTS)
       else()
         CollectSourceFiles(${MODULE_SOURCE_PATH} PRIVATE_SOURCES_MODULES)
       endif()
@@ -343,26 +340,6 @@ if (MOD_ALE_FOUND)
       ${PUBLIC_INCLUDES})
   set_target_properties(modules-ale PROPERTIES FOLDER "modules")
   target_link_libraries(modules PUBLIC modules-ale)
-endif()
-
-if (PRIVATE_SOURCES_MODULE_PLAYERBOTS)
-  add_library(modules-playerbots STATIC ${PRIVATE_SOURCES_MODULE_PLAYERBOTS})
-  target_link_libraries(modules-playerbots
-    PRIVATE
-      acore-core-interface
-      mysql
-    PUBLIC
-      game-interface
-      coa)
-  target_include_directories(modules-playerbots
-    PUBLIC
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ${PUBLIC_INCLUDES})
-  target_compile_options(modules-playerbots
-    PRIVATE
-      -DMOD_PLAYERBOTS)
-  set_target_properties(modules-playerbots PROPERTIES FOLDER "modules")
-  target_link_libraries(modules PUBLIC modules-playerbots)
 endif()
 
 # Enables Devs to Include a cmake file in their module that will get run inline with the config.

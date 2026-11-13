@@ -250,6 +250,7 @@ enum PlayerHook
     PLAYERHOOK_ON_LEARN_PET_TALENT,
     PLAYERHOOK_ON_LEARN_TRAINER_SPELL,
     PLAYERHOOK_ON_TAKE_MAIL_ITEM,
+    PLAYERHOOK_ON_AFTER_TAKE_MAIL_ITEM,
     PLAYERHOOK_CAN_TAKE_QUEST,
     PLAYERHOOK_CAN_REWARD_QUEST,
     PLAYERHOOK_CAN_REPEAT_DAILY_QUEST,
@@ -1113,6 +1114,16 @@ public:
      * @param itemEntry The entry of the taken item
      */
     virtual void OnPlayerTakeMailItem(Player* /*player*/, Mail const* /*mail*/, uint32 /*itemEntry*/) { }
+
+    /**
+     * Called after an item attachment has been successfully
+     * transferred from mail into the player's inventory.
+     *
+     * @param player Player receiving the item
+     * @param itemEntry Item template ID
+     * @param count Quantity transferred
+     */
+    virtual void OnPlayerAfterTakeMailItem(Player* /*player*/, uint32 /*itemEntry*/, uint32 /*count*/) { }
 
     /**
      * @brief This hook is called when the core checks whether the player may see or take a quest.

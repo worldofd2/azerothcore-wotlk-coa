@@ -1131,6 +1131,11 @@ void ScriptMgr::OnPlayerTakeMailItem(Player* player, Mail const* mail, uint32 it
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_TAKE_MAIL_ITEM, script->OnPlayerTakeMailItem(player, mail, itemEntry));
 }
 
+void ScriptMgr::OnPlayerAfterTakeMailItem( Player* player, uint32 itemEntry, uint32 count)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_TAKE_MAIL_ITEM, script->OnPlayerAfterTakeMailItem(player, itemEntry, count));
+}
+
 bool ScriptMgr::OnPlayerCanTakeQuest(Player const* player, Quest const* quest)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_TAKE_QUEST, !script->OnPlayerCanTakeQuest(player, quest));

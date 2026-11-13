@@ -643,6 +643,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
 
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_OK, 0, itemLowGuid, count);
         sScriptMgr->OnPlayerTakeMailItem(player, m, itemEntry);
+        sScriptMgr->OnPlayerAfterTakeMailItem(player, itemEntry, count);
     }
     else
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg);

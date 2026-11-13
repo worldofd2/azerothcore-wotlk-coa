@@ -527,6 +527,7 @@ public: /* PlayerScript */
     void OnPlayerLearnPetTalent(Player* player, Pet* pet, uint32 spellId);
     void OnPlayerLearnTrainerSpell(Player* player, Creature* trainer, uint32 spellId);
     void OnPlayerTakeMailItem(Player* player, Mail const* mail, uint32 itemEntry);
+    void OnPlayerAfterTakeMailItem(Player* player, uint32 itemEntry, uint32 count);
     bool OnPlayerCanTakeQuest(Player const* player, Quest const* quest);
     bool OnPlayerCanRewardQuest(Player const* player, Quest const* quest);
     bool OnPlayerQuestGiverChooseReward(Player* player, Object* questGiver, Quest const* quest, uint32 reward);

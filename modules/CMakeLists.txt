@@ -361,6 +361,11 @@ if (PRIVATE_SOURCES_MODULE_PLAYERBOTS)
   target_compile_options(modules-playerbots
     PRIVATE
       -DMOD_PLAYERBOTS)
+  # CoA Bots: the alts' loot companion uses this core's API (module falls back to the database without it).
+  # Only the playerbots library sees it, so game and scripts are not rebuilt.
+  target_compile_definitions(modules-playerbots
+    PRIVATE
+      "COA_CORE_COMPANION_LOOT_HEADER=\"AscensionCompanionLoot.h\"")
   set_target_properties(modules-playerbots PROPERTIES FOLDER "modules")
   target_link_libraries(modules PUBLIC modules-playerbots)
 endif()

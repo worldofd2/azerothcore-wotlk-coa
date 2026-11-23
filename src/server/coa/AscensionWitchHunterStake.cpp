@@ -21,7 +21,8 @@ bool IsStakeInfo(SpellInfo const* spellInfo)
         legacy.Effect == SPELL_EFFECT_TRIGGER_SPELL && legacy.TriggerSpell == 680548 &&
         legacy.TargetA.GetTarget() == TARGET_UNIT_TARGET_ENEMY && !legacy.TargetB.GetTarget());
     return spellInfo->SpellFamilyName == uint32(CLASS_WITCH_HUNTER) + 6 &&
-        spellInfo->SpellFamilyFlags == flag96(0, 0, 1024) && spellInfo->SchoolMask == SPELL_SCHOOL_MASK_NORMAL &&
+        (spellInfo->SpellFamilyFlags == flag96(0, 0, 1024) || spellInfo->SpellFamilyFlags == flag96(8, 0, 1024)) &&
+        spellInfo->SchoolMask == SPELL_SCHOOL_MASK_NORMAL &&
         spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE && effect.Effect == SPELL_EFFECT_SCHOOL_DAMAGE &&
         effect.TargetA.GetTarget() == TARGET_UNIT_TARGET_ENEMY && !effect.TargetB.GetTarget() &&
         expectedLegacy && !spellInfo->Effects[EFFECT_2].Effect;

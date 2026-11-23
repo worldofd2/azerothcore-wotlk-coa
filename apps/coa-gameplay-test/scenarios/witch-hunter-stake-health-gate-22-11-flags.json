@@ -1,0 +1,334 @@
+{
+  "schema": 1,
+  "name": "Witch Hunter Stake keeps its health gate and drops the legacy 680548 trigger with the 22/11 client flags",
+  "contract": [
+    "Stake 680537 and rank 681347 read 'Only usable on enemies at or below 35% health.' The 22/11 Spell.dbc gives",
+    "both SpellFamilyName 21, SpellFamilyFlags (8,0,1024), TargetAuraState 13 (AURA_STATE_HEALTHLESS_35_PERCENT),",
+    "Effect[0] SCHOOL_DAMAGE on TARGET_UNIT_TARGET_ENEMY, DmgClass Melee, SPELL_ATTR3_REQUIRES_MAIN_HAND_WEAPON",
+    "(EquippedItemClass 2, EquippedItemSubClassMask 41105) and ManaCostPercentage 12; 681347 also has Effect[1]",
+    "TRIGGER_SPELL 680548, a caster PERIODIC_TRIGGER_SPELL aura of Flames of Sin 803710 every 100 ms.",
+    "ApplyAscensionWitchHunterStakeContracts accepts the (8,0,1024) flags, clears TargetAuraState and removes",
+    "Effect[1], so the bound spell_ascension_witch_hunter_stake CheckCast (-680537 chain) returns",
+    "SPELL_FAILED_TARGET_AURASTATE (111) above 35% health. Item 37 is a main-hand one-handed axe (Item.dbc class 2,",
+    "subclass 0). Expected: each rank is refused with 111 and deals no damage at 40% health and lands once at 30%;",
+    "after 681347 lands, the hunter never casts 680548 and neither unit holds it. Maximal melee hit and expertise",
+    "remove miss, dodge and parry from the landing assertions."
+  ],
+  "timeout_ms": 90000,
+  "players": [
+    {
+      "id": "hunter",
+      "race": 1,
+      "class": 15,
+      "level": 40,
+      "melee_hit_rating": 100000,
+      "expertise_rating": 100000
+    }
+  ],
+  "creatures": [
+    {
+      "id": "target",
+      "owner": "hunter",
+      "entry": 36,
+      "level": 40,
+      "health": 500000,
+      "distance": 3
+    },
+    {
+      "id": "rank_target",
+      "owner": "hunter",
+      "entry": 36,
+      "level": 40,
+      "health": 500000,
+      "distance": 3
+    }
+  ],
+  "location": {
+    "map": 0,
+    "x": -9617.06,
+    "y": -288.949,
+    "z": 57.3053,
+    "o": 0
+  },
+  "steps": [
+    {
+      "action": "wait",
+      "label": "Let spawn AI and level scaling settle",
+      "ms": 3000
+    },
+    {
+      "action": "learn",
+      "actor": "hunter",
+      "spell": 196
+    },
+    {
+      "action": "add_item",
+      "actor": "hunter",
+      "item": 37
+    },
+    {
+      "action": "equip",
+      "actor": "hunter",
+      "item": 37,
+      "slot": 15
+    },
+    {
+      "action": "learn",
+      "actor": "hunter",
+      "spell": 680537
+    },
+    {
+      "action": "wait",
+      "label": "Let the equipment settle",
+      "ms": 1500
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the character has a mana pool for Stake's cost",
+      "actor": "hunter",
+      "metric": "max_power",
+      "power": 0,
+      "min": 1
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the first target is at full health",
+      "actor": "target",
+      "metric": "health_pct",
+      "min": 99
+    },
+    {
+      "action": "cast",
+      "label": "Rank 1: Stake on a full-health enemy",
+      "actor": "hunter",
+      "spell": 680537,
+      "target": "target"
+    },
+    {
+      "action": "assert",
+      "label": "Rank 1: Stake is refused at full health",
+      "actor": "hunter",
+      "metric": "cast_failure",
+      "spell": 680537,
+      "equals": 111,
+      "within_ms": 1000
+    },
+    {
+      "action": "set_health_pct",
+      "label": "Bring the Rank 1 target to 40% health",
+      "actor": "hunter",
+      "pct": 40,
+      "target": "target"
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the Rank 1 target is above 35% health",
+      "actor": "target",
+      "metric": "health_pct",
+      "min": 39,
+      "max": 41
+    },
+    {
+      "action": "wait",
+      "label": "Let the health aura state update",
+      "ms": 500
+    },
+    {
+      "action": "cast",
+      "label": "Rank 1: Stake on an enemy at 40% health",
+      "actor": "hunter",
+      "spell": 680537,
+      "target": "target"
+    },
+    {
+      "action": "assert",
+      "label": "Rank 1: Stake is refused above 35% health",
+      "actor": "hunter",
+      "metric": "cast_failure",
+      "spell": 680537,
+      "equals": 111,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Rank 1: no refused Stake dealt damage",
+      "actor": "hunter",
+      "metric": "spell_damage_count",
+      "spell": 680537,
+      "target": "target",
+      "equals": 0
+    },
+    {
+      "action": "set_health_pct",
+      "label": "Bring the Rank 1 target to 30% health",
+      "actor": "hunter",
+      "pct": 30,
+      "target": "target"
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the Rank 1 target is at or below 35% health",
+      "actor": "target",
+      "metric": "health_pct",
+      "max": 35
+    },
+    {
+      "action": "wait",
+      "label": "Let the health aura state update",
+      "ms": 500
+    },
+    {
+      "action": "cast",
+      "label": "Rank 1: Stake on an enemy at 30% health",
+      "actor": "hunter",
+      "spell": 680537,
+      "target": "target"
+    },
+    {
+      "action": "assert",
+      "label": "Rank 1: Stake is accepted at or below 35% health",
+      "actor": "hunter",
+      "metric": "cast_failure",
+      "spell": 680537,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "Rank 1: Stake lands once on the injured enemy",
+      "actor": "hunter",
+      "metric": "spell_damage_count",
+      "spell": 680537,
+      "target": "target",
+      "equals": 1,
+      "within_ms": 2000
+    },
+    {
+      "action": "learn",
+      "actor": "hunter",
+      "spell": 681347
+    },
+    {
+      "action": "wait",
+      "label": "Let the global cooldown pass",
+      "ms": 2000
+    },
+    {
+      "action": "set_health_pct",
+      "label": "Bring the Rank 2 target to 40% health",
+      "actor": "hunter",
+      "pct": 40,
+      "target": "rank_target"
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the Rank 2 target is above 35% health",
+      "actor": "rank_target",
+      "metric": "health_pct",
+      "min": 39,
+      "max": 41
+    },
+    {
+      "action": "wait",
+      "label": "Let the health aura state update",
+      "ms": 500
+    },
+    {
+      "action": "cast",
+      "label": "Rank 2: Stake on an enemy at 40% health",
+      "actor": "hunter",
+      "spell": 681347,
+      "target": "rank_target"
+    },
+    {
+      "action": "assert",
+      "label": "Rank 2: Stake is refused above 35% health",
+      "actor": "hunter",
+      "metric": "cast_failure",
+      "spell": 681347,
+      "equals": 111,
+      "within_ms": 1000
+    },
+    {
+      "action": "assert",
+      "label": "Rank 2: no refused Stake dealt damage",
+      "actor": "hunter",
+      "metric": "spell_damage_count",
+      "spell": 681347,
+      "target": "rank_target",
+      "equals": 0
+    },
+    {
+      "action": "set_health_pct",
+      "label": "Bring the Rank 2 target to 30% health",
+      "actor": "hunter",
+      "pct": 30,
+      "target": "rank_target"
+    },
+    {
+      "action": "assert",
+      "label": "SETUP: the Rank 2 target is at or below 35% health",
+      "actor": "rank_target",
+      "metric": "health_pct",
+      "max": 35
+    },
+    {
+      "action": "wait",
+      "label": "Let the health aura state update",
+      "ms": 500
+    },
+    {
+      "action": "cast",
+      "label": "Rank 2: Stake on an enemy at 30% health",
+      "actor": "hunter",
+      "spell": 681347,
+      "target": "rank_target"
+    },
+    {
+      "action": "assert",
+      "label": "Rank 2: Stake is accepted at or below 35% health",
+      "actor": "hunter",
+      "metric": "cast_failure",
+      "spell": 681347,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "Rank 2: Stake lands once on the injured enemy",
+      "actor": "hunter",
+      "metric": "spell_damage_count",
+      "spell": 681347,
+      "target": "rank_target",
+      "equals": 1,
+      "within_ms": 2000
+    },
+    {
+      "action": "wait",
+      "label": "Give a legacy 680548 trigger time to appear",
+      "ms": 1500
+    },
+    {
+      "action": "assert",
+      "label": "Rank 2: the hunter never casts the removed 680548 trigger",
+      "actor": "hunter",
+      "metric": "spell_cast_count",
+      "spell": 680548,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "Rank 2: the hunter does not hold 680548",
+      "actor": "hunter",
+      "metric": "aura",
+      "spell": 680548,
+      "equals": 0
+    },
+    {
+      "action": "assert",
+      "label": "Rank 2: the target does not hold 680548",
+      "actor": "rank_target",
+      "metric": "aura",
+      "spell": 680548,
+      "equals": 0
+    }
+  ]
+}
